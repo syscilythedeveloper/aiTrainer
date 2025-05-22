@@ -12,6 +12,7 @@ export default defineSchema({
   plans: defineTable({
     userId: v.id("users"),
     name: v.string(),
+    authorId: v.string(),
     workoutPlan: v.object({
       schedule: v.array(v.string()),
       exercises: v.array(
@@ -22,23 +23,22 @@ export default defineSchema({
               name: v.string(),
               sets: v.optional(v.number()),
               reps: v.optional(v.number()),
-              duration: v.optional(v.string()),
+              duration: v.optional(v.number()),
               description: v.optional(v.string()),
               exercises: v.optional(v.array(v.string())),
             })
           ),
         })
       ),
-    }),
-
-    dietPlan: v.object({
-      dailyCalories: v.number(),
-      meals: v.array(
-        v.object({
-          name: v.string(),
-          foods: v.array(v.string()),
-        })
-      ),
+      dietPlan: v.object({
+        dailyCalores: v.number(),
+        meals: v.array(
+          v.object({
+            name: v.string(),
+            foods: v.array(v.string()),
+          })
+        ),
+      }),
     }),
     isActive: v.boolean(),
   })

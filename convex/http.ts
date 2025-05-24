@@ -5,6 +5,7 @@ import { api } from "./_generated/api";
 import { httpAction } from "./_generated/server";
 
 const http = httpRouter();
+
 const handleClerkWebhook = httpAction(async (ctx, request) => {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
   if (!webhookSecret) {

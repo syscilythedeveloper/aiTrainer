@@ -1,15 +1,8 @@
-import { defineSchema, defineTable } from "convex/server";
+import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-export default defineSchema({
-  users: defineTable({
-    name: v.string(),
-    email: v.string(),
-    image: v.optional(v.string()),
-    clerkId: v.string(),
-  }).index("by_clerk_id", ["clerkId"]),
-
-  plans: defineTable({
+export const createPlan = mutation({
+  args: {
     // userId: v.id("users"),
     userId: v.string(),
     name: v.string(),
@@ -21,8 +14,8 @@ export default defineSchema({
           routines: v.array(
             v.object({
               name: v.string(),
-              sets: v.optional(v.number()),
-              reps: v.optional(v.number()),
+              sets: v.number(),
+              reps: v.number(),
               duration: v.optional(v.number()),
               description: v.optional(v.string()),
               exercises: v.optional(v.array(v.string())),
@@ -31,7 +24,6 @@ export default defineSchema({
         })
       ),
     }),
-
     dietPlan: v.object({
       dailyCalories: v.number(),
       meals: v.array(
@@ -42,7 +34,19 @@ export default defineSchema({
       ),
     }),
     isActive: v.boolean(),
-  })
-    .index("by_user_id", ["userId"])
-    .index("by_active", ["isActive"]),
+  },
+  handler: async (ctx, args) => {
+    const activePlans = await ctx.db
+      .query("plans")
+      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .collect();
+
+    for (const plan of activePlans) {
+      await ctx.db.patch(plan._id, { isActive: false });
+    }
+
+    const planId = await ctx.db.insert("plans", args);
+    return planId;
+  },
 });

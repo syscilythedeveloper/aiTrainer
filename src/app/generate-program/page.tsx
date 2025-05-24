@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,6 +16,8 @@ const GenerateProgram = () => {
   const [connecting, setConnecting] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
+  const [messages, setMessages] = useState<any[]>([]);
+  const vapiCallRef = useRef<any>(null);
 
   const { user } = useUser();
   const router = useRouter();
@@ -24,8 +28,9 @@ const GenerateProgram = () => {
     setCallActive(true);
     setCallEnded(false);
   };
-  const handleCallEnd = () => {
+  const handleCallEnd = async () => {
     console.log("Call ended");
+
     setCallActive(false);
     setConnecting(false);
     setIsSpeaking(false);
@@ -34,7 +39,6 @@ const GenerateProgram = () => {
   const handleSpeechStart = () => {
     console.log("AI started Speaking");
     setIsSpeaking(true);
-    console.log(vapi);
   };
   const handleSpeechEnd = () => {
     console.log("AI stopped Speaking");
@@ -46,6 +50,17 @@ const GenerateProgram = () => {
     setConnecting(false);
     setCallActive(false);
   };
+  const handleMessage = (message: any) => {
+    if (message.type === "transcript" && message.transcriptType === "final") {
+      const newMessage = { content: message.transcript, role: message.role };
+      console.log("New message:", newMessage);
+      setMessages((prev: any) => [...prev, newMessage]);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Updated messages:", messages);
+  }, [messages]);
 
   const toggleCall = async () => {
     if (callActive) vapi.stop();
@@ -54,15 +69,13 @@ const GenerateProgram = () => {
         setConnecting(true);
         setCallEnded(false);
 
-        const full_name = user?.firstName
-          ? `${user.firstName} ${user.lastName || ""}`.trim()
-          : "There";
+        const vapiBeginning = await vapi.start(
+          process.env.NEXT_PUBLIC_ASSISTANT_ID
+        );
+        console.log("Vapi beginning:", vapiBeginning);
+        console.log("Vapi id: ", vapiBeginning!.id);
 
-        await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
-          variableValues: { full_name },
-          clientMessages: [],
-          serverMessages: [],
-        });
+        vapiCallRef.current = vapiBeginning;
       } catch (error) {
         console.log("Failed to start call", error);
         setConnecting(false);
@@ -87,6 +100,7 @@ const GenerateProgram = () => {
       .on("call-end", handleCallEnd)
       .on("speech-start", handleSpeechStart)
       .on("speech-end", handleSpeechEnd)
+      .on("message", handleMessage)
 
       .on("error", handleError);
 
@@ -95,8 +109,8 @@ const GenerateProgram = () => {
         .off("call-start", handleCallStart)
         .off("call-end", handleCallEnd)
         .off("speech-start", handleSpeechStart)
+        .off("message", handleMessage)
         .off("speech-end", handleSpeechEnd)
-
         .off("error", handleError);
     };
   }, []);

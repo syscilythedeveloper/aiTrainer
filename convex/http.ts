@@ -66,5 +66,34 @@ http.route({
   method: "POST",
   handler: handleClerkWebhook,
 });
+const generateRequest = httpAction(async (ctx, request) => {
+  console.log("Recieved request", request);
+  console.log("Request headers", request.headers);
+  const age = request.headers.get("age");
+  console.log("Age from headers:", age);
+
+  try {
+    // const planId = await ctx.runMutation(api.plans.createPlan, {
+    //   userId,
+    //   name,
+    //   workoutPlan,
+    //   dietPlan,
+    //   isActive: true,
+    // });
+
+    return new Response(JSON.stringify({ request }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error creating plan:", error);
+    return new Response("Error creating plan", { status: 500 });
+  }
+});
+http.route({
+  path: "/vapi-generate-program",
+  method: "POST",
+  handler: generateRequest,
+});
 
 export default http;

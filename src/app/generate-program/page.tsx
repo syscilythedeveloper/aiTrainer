@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useRef } from "react";
+
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,7 +17,6 @@ const GenerateProgram = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
-  const vapiCallRef = useRef<any>(null);
 
   const { user } = useUser();
   const router = useRouter();
@@ -68,14 +67,21 @@ const GenerateProgram = () => {
       try {
         setConnecting(true);
         setCallEnded(false);
+        const userId = user?.id || "guest";
+        const name = user?.firstName ? user.firstName.trim() : "Friend";
 
-        const vapiBeginning = await vapi.start(
-          process.env.NEXT_PUBLIC_ASSISTANT_ID
+        const assistantOverrides = {
+          variableValues: {
+            userId,
+            name,
+          },
+        };
+
+        await vapi.start(
+          process.env.NEXT_PUBLIC_ASSISTANT_ID,
+          //@ts-ignore
+          assistantOverrides
         );
-        console.log("Vapi beginning:", vapiBeginning);
-        console.log("Vapi id: ", vapiBeginning!.id);
-
-        vapiCallRef.current = vapiBeginning;
       } catch (error) {
         console.log("Failed to start call", error);
         setConnecting(false);

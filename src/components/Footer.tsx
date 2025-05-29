@@ -1,4 +1,4 @@
-import { ZapIcon } from "lucide-react";
+import { GiStrongMan } from "react-icons/gi";
 import Link from "next/link";
 
 const Footer = () => {
@@ -15,8 +15,8 @@ const Footer = () => {
               href="/"
               className="flex items-center gap-2"
             >
-              <div className="p-1 bg-primary/10 rounded">
-                <ZapIcon className="w-4 h-4 text-primary" />
+              <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-full">
+                <GiStrongMan className="w-4 h-4 text-yellow-400" />
               </div>
               <span className="text-xl font-bold font-mono">
                 my<span className="text-primary">TrAIner</span>+
@@ -27,49 +27,12 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Links */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-12 gap-y-2 text-sm">
-            <Link
-              href="/about"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              href="/terms"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              Terms
-            </Link>
-            <Link
-              href="/privacy"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              Privacy
-            </Link>
-            <Link
-              href="/contact"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              Contact
-            </Link>
-            <Link
-              href="/blog"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              Blog
-            </Link>
-            <Link
-              href="/help"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              Help
-            </Link>
-          </div>
-
           {/* Status */}
           <div className="flex items-center gap-2 px-3 py-2 border border-border rounded-md bg-background/50">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+            <div
+              className="w-2 h-2 rounded-full bg-primary blink"
+              style={{ backgroundColor: "#38f882" }}
+            ></div>
             <span className="text-xs font-mono">SYSTEM OPERATIONAL</span>
           </div>
         </div>

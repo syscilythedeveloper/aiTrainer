@@ -1,7 +1,8 @@
 "use client";
 
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
-import { DumbbellIcon, HomeIcon, UserIcon, ZapIcon } from "lucide-react";
+import { GiStrongMan } from "react-icons/gi";
+import { DumbbellIcon, HomeIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 
@@ -16,8 +17,8 @@ const Navbar = () => {
           href="/"
           className="flex items-center gap-2"
         >
-          <div className="p-1 bg-primary/10 rounded">
-            <ZapIcon className="w-4 h-4 text-primary" />
+          <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-full">
+            <GiStrongMan className="w-4 h-4 text-yellow-400" />
           </div>
           <span className="text-xl font-bold font-mono">
             my<span className="text-primary">TrAIner</span>+

@@ -67,23 +67,38 @@ http.route({
   handler: handleClerkWebhook,
 });
 const generateRequest = httpAction(async (ctx, request) => {
-  console.log("Recieved request", request);
-  console.log("Request headers", request.headers);
-  const age = request.headers.get("age");
-  console.log("Age from headers:", age);
-
   try {
-    // const planId = await ctx.runMutation(api.plans.createPlan, {
-    //   userId,
-    //   name,
-    //   workoutPlan,
-    //   dietPlan,
-    //   isActive: true,
-    // });
+    const url = new URL(request.url);
+    const params = url.searchParams;
 
-    return new Response(JSON.stringify({ request }), {
+    // Extract and decode parameters
+    const age = params.get("age");
+    const gender = params.get("gender");
+    const userId = params.get("userId");
+    const height = params.get("height");
+    const weight = params.get("weight");
+    const fitness_goal = params.get("fitness_goal");
+    const fitness_level = params.get("fitness_level");
+    const dietary_restrictions = params.get("dietary_restrictions");
+    const physical_limitations = params.get("physical_limitations");
+    const workout_days_per_week = params.get("workout_days_per_week");
+
+    // Example: log the parsed values
+    console.log({
+      age,
+      gender,
+      userId,
+      height,
+      weight,
+      fitness_goal,
+      fitness_level,
+      dietary_restrictions,
+      physical_limitations,
+      workout_days_per_week,
+    });
+
+    return new Response("Plan created successfully", {
       status: 200,
-      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error creating plan:", error);

@@ -18,9 +18,36 @@ const GenerateProgram = () => {
   const [callEnded, setCallEnded] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
 
+  const TOTAL_QUESTIONS = 10;
+  const [userStep, setUserStep] = useState(0);
+  const progressPercent = Math.min((userStep / TOTAL_QUESTIONS) * 100, 100);
+
   const { user } = useUser();
   const router = useRouter();
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  // SOLUTION to get rid of "Meeting has ended" error
+  useEffect(() => {
+    const originalError = console.error;
+    // override console.error to ignore "Meeting has ended" errors
+    console.error = function (msg, ...args) {
+      if (
+        msg &&
+        (msg.includes("Meeting has ended") ||
+          (args[0] && args[0].toString().includes("Meeting has ended")))
+      ) {
+        console.log("Ignoring known error: Meeting has ended");
+        return; // don't pass to original handler
+      }
+
+      // pass all other errors to the original handler
+      return originalError.call(console, msg, ...args);
+    };
+
+    // restore original handler on unmount
+    return () => {
+      console.error = originalError;
+    };
+  }, []);
 
   const handleCallStart = () => {
     console.log("Call started");
@@ -35,6 +62,7 @@ const GenerateProgram = () => {
     setConnecting(false);
     setIsSpeaking(false);
     setCallEnded(true);
+    setUserStep(TOTAL_QUESTIONS);
   };
   const handleSpeechStart = () => {
     console.log("AI started Speaking");
@@ -55,6 +83,9 @@ const GenerateProgram = () => {
       const newMessage = { content: message.transcript, role: message.role };
       console.log("New message:", newMessage);
       setMessages((prev: any) => [...prev, newMessage]);
+      if (message.role === "user") {
+        setUserStep((prev) => prev + 1);
+      }
     }
   };
 
@@ -138,12 +169,26 @@ const GenerateProgram = () => {
             Chat with myTrainer+ to create your training and nutrition plan
           </p>
         </div>
+        <div className="mb-6 p-4 bg-card/50 border border-border rounded-lg">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium">Plan Creation Progress</span>
+            <span className="text-xs text-primary">{progressPercent}%</span>
+          </div>
+          <div className="w-full bg-muted h-2 rounded-full">
+            <div
+              className="bg-primary h-2 rounded-full transition-all duration-500"
+              style={{
+                width: `${progressPercent}%`,
+              }}
+            ></div>
+          </div>
+        </div>
 
         {/* VIDEO CALL AREA */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* AI ASSISTANT CARD */}
           <Card className="bg-card/90 backdrop-blur-sm border border-border overflow-hidden relative">
-            <div className="aspect-video flex flex-col items-center justify-center p-6 relative">
+            <div className="flex flex-col items-center justify-center p-6 relative">
               {/* AI VOICE ANIMATION */}
               <div
                 className={`absolute inset-0 ${

@@ -138,11 +138,11 @@ const generateRequest = httpAction(async (ctx, request) => {
     const workoutPlanText = workoutResult.response.text();
 
     const workoutPlan = validateWorkoutPlan(JSON.parse(workoutPlanText));
-    console.log("Validated Workout Plan----------:", workoutPlan);
+
     const mealPlanResult = await model.generateContent(mealPlanPrompt);
     const mealPlanText = mealPlanResult.response.text();
     const dietPlan = validateMealPlan(JSON.parse(mealPlanText));
-    console.log("Validated Meal Plan-------------:", dietPlan);
+
     // save to our DB: CONVEX
 
     const planId = await ctx.runMutation(api.plans.createPlan, {

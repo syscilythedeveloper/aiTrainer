@@ -5,7 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { vapi } from "@/lib/vapi";
 
@@ -20,6 +20,7 @@ const GenerateProgram = () => {
 
   const { user } = useUser();
   const router = useRouter();
+  const messageContainerRef = useRef<HTMLDivElement>(null);
 
   const handleCallStart = () => {
     console.log("Call started");
@@ -58,7 +59,10 @@ const GenerateProgram = () => {
   };
 
   useEffect(() => {
-    console.log("Updated messages:", messages);
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const toggleCall = async () => {
@@ -79,7 +83,7 @@ const GenerateProgram = () => {
 
         await vapi.start(
           process.env.NEXT_PUBLIC_ASSISTANT_ID,
-          //@ts-ignore
+          //@ts-expect-error vapi.start expects a string, but we are passing an object
           assistantOverrides
         );
       } catch (error) {
@@ -127,12 +131,11 @@ const GenerateProgram = () => {
         {/* Title */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold font-mono">
-            <span>Generate Your </span>
-            <span className="text-primary uppercase">Fitness Program</span>
+            <span>Buid Your </span>
+            <span className="text-primary uppercase">Personal Plan</span>
           </h1>
           <p className="text-muted-foreground mt-2">
-            Have a voice conversation with our AI assistant to create your
-            personalized plan
+            Chat with myTrainer+ to create your training and nutrition plan
           </p>
         </div>
 
@@ -167,7 +170,7 @@ const GenerateProgram = () => {
               </div>
 
               {/* AI IMAGE */}
-              <div className="relative size-32 mb-4">
+              <div className="relative size-20 mb-4">
                 <div
                   className={`absolute inset-0 bg-primary opacity-10 rounded-full blur-lg ${
                     isSpeaking ? "animate-pulse" : ""
@@ -223,7 +226,7 @@ const GenerateProgram = () => {
           >
             <div className="aspect-video flex flex-col items-center justify-center p-6 relative">
               {/* User Image */}
-              <div className="relative size-32 mb-4">
+              <div className="relative size-20 mb-4">
                 <img
                   src={user?.imageUrl}
                   alt="User"
@@ -249,6 +252,87 @@ const GenerateProgram = () => {
             </div>
           </Card>
         </div>
+
+        {/* MESSAGE CONTAINER - Updated Chat Style */}
+        {messages.length > 0 && (
+          <div
+            ref={messageContainerRef}
+            className="w-full h-96 overflow-y-auto bg-card/80 border border-border rounded-xl px-4 py-2 mb-8"
+          >
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`flex gap-4 animate-fadeIn ${
+                  msg.role === "user" ? "flex-row-reverse" : ""
+                }`}
+              >
+                {/* Avatar */}
+                <div
+                  className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-lg flex-shrink-0 ${
+                    msg.role === "assistant"
+                      ? "bg-gradient-to-br from-primary to-secondary text-primary-foreground border-2 border-primary/30 shadow-lg shadow-primary/20"
+                      : "bg-gradient-to-br from-blue-500 to-purple-600 text-white"
+                  }`}
+                >
+                  {msg.role === "assistant" ? (
+                    <Image
+                      width={40}
+                      height={40}
+                      src="/ai_assistant.png"
+                      alt="AI Assistant"
+                      className="w-full h-full object-cover object-[center_20%] rounded-full"
+                    />
+                  ) : (
+                    "👤"
+                  )}
+                </div>
+
+                {/* Message Content */}
+                <div
+                  className={`max-w-[70%] p-4 rounded-2xl ${
+                    msg.role === "assistant"
+                      ? "bg-green-900 border border-green-700 rounded-bl-sm"
+                      : "bg-blue-500/20 border border-blue-500/30 rounded-br-sm"
+                  }`}
+                >
+                  {/* Sender Name */}
+                  <div
+                    className={`text-xs font-semibold mb-2 opacity-80 ${
+                      msg.role === "assistant"
+                        ? "text-yellow-400"
+                        : "text-blue-400"
+                    }`}
+                  >
+                    {msg.role === "assistant" ? "myTrainer+ AI" : "You"}
+                  </div>
+
+                  {/* Message Text */}
+                  <p className="text-foreground text-sm leading-relaxed">
+                    {msg.content}
+                  </p>
+                </div>
+              </div>
+            ))}
+
+            {/* System Message (Call Ended) */}
+            {callEnded && (
+              <div className="flex gap-4 animate-fadeIn">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 bg-gradient-to-br from-green-500 to-emerald-600 text-white">
+                  ✓
+                </div>
+                <div className="max-w-[70%] p-4 rounded-2xl bg-green-500/10 border border-green-500/20 rounded-bl-sm">
+                  <div className="text-xs font-semibold mb-2 opacity-80 text-green-400">
+                    System
+                  </div>
+                  <p className="text-foreground text-sm leading-relaxed">
+                    Your fitness program has been created! Redirecting to your
+                    profile...
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* CALL CONTROLS */}
         <div className="w-full flex justify-center gap-4">

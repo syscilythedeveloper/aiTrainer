@@ -3,8 +3,16 @@ import { WebhookEvent } from "@clerk/nextjs/server";
 import { Webhook } from "svix";
 import { api } from "./_generated/api";
 import { httpAction } from "./_generated/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import {
+  getWorkoutPrompt,
+  getMealPlanPrompt,
+  validateWorkoutPlan,
+  validateMealPlan,
+} from "@/app/generate-program/prompts";
 
 const http = httpRouter();
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 const handleClerkWebhook = httpAction(async (ctx, request) => {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
@@ -73,33 +81,92 @@ const generateRequest = httpAction(async (ctx, request) => {
 
     // Extract and decode parameters
     const age = params.get("age");
-    const gender = params.get("gender");
+    const gender = params.get("gender") || "not specified";
     const userId = params.get("userId");
+    if (!userId) {
+      throw new Error("Missing required parameter: userId");
+    }
     const height = params.get("height");
     const weight = params.get("weight");
-    const fitness_goal = params.get("fitness_goal");
-    const fitness_level = params.get("fitness_level");
-    const dietary_restrictions = params.get("dietary_restrictions");
-    const physical_limitations = params.get("physical_limitations");
-    const workout_days_per_week = params.get("workout_days_per_week");
+    const fitness_goal = params.get("fitness_goal") || "Tone Up";
+    const fitness_level = params.get("fitness_level") || "Beginner";
+    const dietary_restrictions = params.get("dietary_restrictions") || "None";
+    const physical_limitations = params.get("physical_limitations") || "None";
+    const workout_days_per_week = params.get("workout_days_per_week") || 3;
 
-    // Example: log the parsed values
-    console.log({
+    if (
+      !age ||
+      !height ||
+      !weight ||
+      !physical_limitations ||
+      !workout_days_per_week ||
+      !fitness_goal ||
+      !fitness_level ||
+      !gender
+    ) {
+      throw new Error("Missing required parameters for workout prompt.");
+    }
+
+    const workOutPrompt = getWorkoutPrompt({
       age,
-      gender,
-      userId,
       height,
+      gender,
       weight,
-      fitness_goal,
-      fitness_level,
-      dietary_restrictions,
       physical_limitations,
       workout_days_per_week,
+      fitness_goal,
+      fitness_level,
+    });
+    const mealPlanPrompt = getMealPlanPrompt({
+      age,
+      height,
+      gender,
+      weight,
+      fitness_goal,
+      dietary_restrictions,
     });
 
-    return new Response("Plan created successfully", {
-      status: 200,
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash-001",
+      generationConfig: {
+        temperature: 0.4, // lower temperature for more predictable outputs
+        topP: 0.9,
+        responseMimeType: "application/json",
+      },
     });
+    const workoutResult = await model.generateContent(workOutPrompt);
+    const workoutPlanText = workoutResult.response.text();
+
+    const workoutPlan = validateWorkoutPlan(JSON.parse(workoutPlanText));
+    console.log("Validated Workout Plan----------:", workoutPlan);
+    const mealPlanResult = await model.generateContent(mealPlanPrompt);
+    const mealPlanText = mealPlanResult.response.text();
+    const dietPlan = validateMealPlan(JSON.parse(mealPlanText));
+    console.log("Validated Meal Plan-------------:", dietPlan);
+    // save to our DB: CONVEX
+
+    const planId = await ctx.runMutation(api.plans.createPlan, {
+      userId,
+      dietPlan,
+      isActive: true,
+      workoutPlan,
+      name: `${fitness_goal} Plan - ${new Date().toLocaleDateString()}`,
+    });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          planId,
+          workoutPlan,
+          dietPlan,
+        },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error("Error creating plan:", error);
     return new Response("Error creating plan", { status: 500 });

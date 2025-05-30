@@ -3,7 +3,7 @@ import { v } from "convex/values";
 
 export const createPlan = mutation({
   args: {
-    // userId: v.id("users"),
+    //userId: v.id("users"),
     userId: v.string(),
     name: v.string(),
     workoutPlan: v.object({
@@ -26,10 +26,19 @@ export const createPlan = mutation({
     }),
     dietPlan: v.object({
       dailyCalories: v.number(),
-      meals: v.array(
+      dailyProtein: v.optional(v.number()),
+      dailyCarbs: v.optional(v.number()),
+      dailyFat: v.optional(v.number()),
+      groceryList: v.optional(v.array(v.string())),
+      weeklyMeals: v.array(
         v.object({
-          name: v.string(),
-          foods: v.array(v.string()),
+          day: v.string(),
+          meals: v.array(
+            v.object({
+              name: v.string(),
+              foods: v.array(v.string()),
+            })
+          ),
         })
       ),
     }),

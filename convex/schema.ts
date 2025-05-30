@@ -34,10 +34,19 @@ export default defineSchema({
 
     dietPlan: v.object({
       dailyCalories: v.number(),
-      meals: v.array(
+      dailyProtein: v.optional(v.number()),
+      dailyCarbs: v.optional(v.number()),
+      dailyFat: v.optional(v.number()),
+      groceryList: v.optional(v.array(v.string())),
+      weeklyMeals: v.array(
         v.object({
-          name: v.string(),
-          foods: v.array(v.string()),
+          day: v.string(),
+          meals: v.array(
+            v.object({
+              name: v.string(),
+              foods: v.array(v.string()),
+            })
+          ),
         })
       ),
     }),

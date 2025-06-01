@@ -72,3 +72,33 @@ export const getUserPlans = query({
     return plans;
   },
 });
+
+export const updatePlan = mutation({
+  args: {
+    planId: v.id("plans"),
+    updatedDays: v.record(v.string(), v.boolean()), // e.g. { Monday: true, Tuesday: false }
+  },
+  handler: async (ctx, args) => {
+    // Fetch the existing plan
+    const plan = await ctx.db.get(args.planId);
+    if (!plan) return;
+
+    // Update workoutComplete for each day in exercises
+    const updatedExercises = plan.workoutPlan.exercises.map((exerciseDay) => ({
+      ...exerciseDay,
+      workoutComplete: args.updatedDays.hasOwnProperty(exerciseDay.day)
+        ? args.updatedDays[exerciseDay.day]
+        : exerciseDay.workoutComplete,
+    }));
+
+    // Patch the plan with the updated exercises
+    await ctx.db.patch(args.planId, {
+      workoutPlan: {
+        ...plan.workoutPlan,
+        exercises: updatedExercises,
+      },
+    });
+
+    return { success: true };
+  },
+});

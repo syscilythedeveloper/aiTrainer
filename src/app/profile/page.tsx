@@ -17,6 +17,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { CheckCircle2, Circle } from "lucide-react"; // Add at the top
+import { useMutation } from "convex/react";
 
 const ProfilePage = () => {
   const { user, isLoaded } = useUser();
@@ -30,6 +31,7 @@ const ProfilePage = () => {
   const [checkedDays, setCheckedDays] = useState<Record<string, boolean>>({});
 
   const activePlan = allPlans?.find((plan) => plan.isActive);
+  const updatePlan = useMutation(api.plans.updatePlan);
 
   const currentPlan = selectedPlanId
     ? allPlans?.find((plan) => plan._id === selectedPlanId)
@@ -250,7 +252,16 @@ const ProfilePage = () => {
                     >
                       {allDaysChecked ? "Reset All" : "Mark All as Complete"}
                     </button>
-                    <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
+                    <button
+                      className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition"
+                      onClick={async () => {
+                        if (!currentPlan?._id) return;
+                        await updatePlan({
+                          planId: currentPlan._id,
+                          updatedDays: checkedDays,
+                        });
+                      }}
+                    >
                       {" "}
                       Save Progress
                     </button>

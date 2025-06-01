@@ -32,6 +32,12 @@ const ProfilePage = () => {
   const [selectedPlanId, setSelectedPlanId] = useState<null | string>(null);
   const [activeTab, setActiveTab] = useState("workout");
   const [checkedDays, setCheckedDays] = useState<Record<string, boolean>>({});
+  function toTitleCase(str: string) {
+    return str.replace(
+      /\w\S*/g,
+      (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+    );
+  }
 
   const activePlan = allPlans?.find((plan) => plan.isActive);
   const updatePlan = useMutation(api.plans.updatePlan);
@@ -120,7 +126,14 @@ const ProfilePage = () => {
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                 <h3 className="text-lg font-bold">
-                  PLAN: <span className="text-primary">{currentPlan.name}</span>
+                  PLAN:{" "}
+                  <span className="text-primary">
+                    <span className="text-md text-muted-foreground">
+                      {toTitleCase(
+                        currentPlan.name.replace(/plan/gi, "").trim()
+                      )}
+                    </span>
+                  </span>
                 </h3>
               </div>
 

@@ -18,7 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { CheckCircle2, Circle } from "lucide-react"; // Add at the top
+import { CheckCircle2, Circle } from "lucide-react";
 import { useMutation } from "convex/react";
 import { FaRunning } from "react-icons/fa";
 
@@ -47,22 +47,22 @@ const ProfilePage = () => {
     : 0;
   const percentComplete =
     totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
-  let pieColor = "#ef4444"; // Red
+  let pieColor = "#ef4444";
   let progressLabel = "Just getting started";
   if (percentComplete > 90) {
-    pieColor = "#10b981"; // Green
+    pieColor = "#10b981";
     progressLabel = "Crushed it!";
   } else if (percentComplete > 70) {
-    pieColor = "#84cc16"; // Lime
+    pieColor = "#84cc16";
     progressLabel = "Almost done!";
   } else if (percentComplete > 50) {
-    pieColor = "#eab308"; // Yellow
+    pieColor = "#eab308";
     progressLabel = "Halfway there";
   } else if (percentComplete > 10) {
-    pieColor = "#f97316"; // Orange
+    pieColor = "#f97316";
     progressLabel = "Building momentum";
   } else if (percentComplete === 0) {
-    pieColor = "#64748b"; // Amber
+    pieColor = "#64748b";
     progressLabel = "Let's get going";
   }
 
@@ -320,11 +320,9 @@ const ProfilePage = () => {
                       <div className="max-h-145 overflow-y-auto border rounded bg-background/50 mb-4 px-3 py-2">
                         <ul className="list-disc list-inside text-xl text-foreground">
                           {currentPlan.dietPlan.groceryList
-                            .slice()
+                            ?.slice()
                             .sort((a, b) => a.localeCompare(b))
-                            .map((item, idx) => (
-                              <li key={idx}>{item}</li>
-                            ))}
+                            .map((item, idx) => <li key={idx}>{item}</li>)}
                         </ul>
                       </div>
                     </div>

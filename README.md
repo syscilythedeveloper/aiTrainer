@@ -127,6 +127,7 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 - Deploy easily to [Vercel](https://vercel.com/) or any platform that supports Next.js.
 - Make sure to set all required environment variables in your deployment dashboard.
+- https://ai-trainer-six.vercel.app/
 
 ---
 

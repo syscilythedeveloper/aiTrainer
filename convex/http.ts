@@ -4,6 +4,7 @@ import { Webhook } from "svix";
 import { api } from "./_generated/api";
 import { httpAction } from "./_generated/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
 import {
   getWorkoutPrompt,
   getMealPlanPrompt,
@@ -95,21 +96,22 @@ http.route({
 });
 const generateRequest = httpAction(async (ctx, request) => {
   try {
-    const bodyText = await request.text();
-    console.log("Request Body:", bodyText);
-    const params = new URLSearchParams(bodyText);
+    const data = await request.json();
 
-    // Extract and decode parameters
-    const age = params.get("age");
-    const gender = params.get("gender") || "not specified";
-    const userId = params.get("userId");
-    const height = params.get("height");
-    const weight = params.get("weight");
-    const fitness_goal = params.get("fitness_goal") || "Tone Up";
-    const fitness_level = params.get("fitness_level") || "Beginner";
-    const dietary_restrictions = params.get("dietary_restrictions") || "None";
-    const physical_limitations = params.get("physical_limitations") || "None";
-    const workout_days_per_week = params.get("workout_days_per_week") || 3;
+    const args = data.message.toolCalls[0].function.arguments;
+
+    const {
+      userId,
+      height,
+      weight,
+      gender,
+      age,
+      fitness_goal,
+      fitness_level,
+      dietary_restrictions,
+      physical_limitations,
+      workout_days_per_week,
+    } = args;
 
     if (
       !age ||
@@ -187,6 +189,8 @@ const generateRequest = httpAction(async (ctx, request) => {
         headers: { "Content-Type": "application/json" },
       }
     );
+
+    return new Response("Yay! This is a test response.");
   } catch (error) {
     console.error("Error creating plan:", error);
     return new Response("Error creating plan", { status: 500 });

@@ -327,7 +327,13 @@ const GenerateProgram = () => {
                       className="w-full h-full object-cover object-[center_20%] rounded-full"
                     />
                   ) : (
-                    "👤"
+                    <Image
+                      width={40}
+                      height={40}
+                      src={user?.imageUrl || "/default-user.png"}
+                      alt="User"
+                      className="w-full h-full object-cover rounded-full"
+                    />
                   )}
                 </div>
 

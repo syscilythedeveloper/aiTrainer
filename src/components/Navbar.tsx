@@ -53,13 +53,7 @@ const Navbar = () => {
                 <UserIcon size={16} />
                 <span>Profile</span>
               </Link>
-              <Button
-                asChild
-                variant="outline"
-                className="ml-2 border-primary/50 text-primary hover:text-white hover:bg-primary/10"
-              >
-                <Link href="/generate-program">Get Started</Link>
-              </Button>
+
               <UserButton />
             </>
           ) : (

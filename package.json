@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@brightlayer-ui/react-progress-icons": "^2.1.1",
     "@clerk/nextjs": "^6.19.5",
     "@google/genai": "^1.0.1",
     "@google/generative-ai": "^0.24.1",

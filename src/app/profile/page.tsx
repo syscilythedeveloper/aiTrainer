@@ -10,6 +10,7 @@ import CornerElements from "@/components/CornerElements";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppleIcon, CalendarIcon, DumbbellIcon } from "lucide-react";
+import { Pie } from "@brightlayer-ui/react-progress-icons";
 import {
   Accordion,
   AccordionContent,
@@ -36,6 +37,32 @@ const ProfilePage = () => {
   const currentPlan = selectedPlanId
     ? allPlans?.find((plan) => plan._id === selectedPlanId)
     : activePlan;
+
+  const totalDays = currentPlan?.workoutPlan.exercises.length ?? 0;
+  const completedDays = currentPlan
+    ? currentPlan.workoutPlan.exercises.filter((day) => day.workoutComplete)
+        .length
+    : 0;
+  const percentComplete =
+    totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
+  let pieColor = "#ef4444"; // Red
+  let progressLabel = "Just getting started";
+  if (percentComplete > 90) {
+    pieColor = "#10b981"; // Green
+    progressLabel = "Crushed it!";
+  } else if (percentComplete > 70) {
+    pieColor = "#84cc16"; // Lime
+    progressLabel = "Almost done!";
+  } else if (percentComplete > 50) {
+    pieColor = "#eab308"; // Yellow
+    progressLabel = "Halfway there";
+  } else if (percentComplete > 10) {
+    pieColor = "#f97316"; // Orange
+    progressLabel = "Building momentum";
+  } else if (percentComplete === 0) {
+    pieColor = "#64748b"; // Amber
+    progressLabel = "Let's get going";
+  }
 
   const allDaysChecked =
     currentPlan &&
@@ -136,6 +163,19 @@ const ProfilePage = () => {
                       <CalendarIcon className="h-4 w-4 text-primary" />
                       <span className="font-mono text-sm text-muted-foreground">
                         SCHEDULE: {currentPlan.workoutPlan.schedule.join(", ")}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-mono text-sm text-muted-foreground">
+                        <Pie
+                          percent={percentComplete}
+                          size={20}
+                          color={pieColor}
+                          ring={4}
+                          outlined={true}
+                        />{" "}
+                        Workouts Completed: {completedDays}/{totalDays} (
+                        {percentComplete}%) - {progressLabel}
                       </span>
                     </div>
 

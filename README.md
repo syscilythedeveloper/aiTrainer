@@ -130,12 +130,7 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## License
-
-MIT
-
----
-
 ## Contact
 
-For questions or support, open an issue on GitHub or contact the project maintainer.
+syscily.com
+linkedin.com/in/syscilybrown

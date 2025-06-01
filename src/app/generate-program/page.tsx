@@ -124,7 +124,6 @@ const GenerateProgram = () => {
     }
   };
 
-  // navigate user to profile page after the call ends
   useEffect(() => {
     if (callEnded) {
       const redirectTimer = setTimeout(() => {
@@ -272,10 +271,11 @@ const GenerateProgram = () => {
             <div className="aspect-video flex flex-col items-center justify-center p-6 relative">
               {/* User Image */}
               <div className="relative size-20 mb-4">
-                <img
-                  src={user?.imageUrl}
+                <Image
+                  src={user?.imageUrl || "/default-user.png"}
                   alt="User"
-                  // ADD THIS "size-full" class to make it rounded on all images
+                  width={80}
+                  height={80}
                   className="size-full object-cover object-top rounded-full"
                 />
               </div>
@@ -287,7 +287,6 @@ const GenerateProgram = () => {
                   : "Guest"}
               </p>
 
-              {/* User Ready Text */}
               <div
                 className={`mt-4 flex items-center gap-2 px-3 py-1 rounded-full bg-card border`}
               >
@@ -298,7 +297,7 @@ const GenerateProgram = () => {
           </Card>
         </div>
 
-        {/* MESSAGE CONTAINER - Updated Chat Style */}
+        {/* MESSAGE CONTAINER  */}
         {messages.length > 0 && (
           <div
             ref={messageContainerRef}

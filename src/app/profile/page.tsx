@@ -16,6 +16,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { CheckCircle2, Circle } from "lucide-react"; // Add at the top
 
 const ProfilePage = () => {
   const { user, isLoaded } = useUser();
@@ -26,12 +27,17 @@ const ProfilePage = () => {
   );
   const [selectedPlanId, setSelectedPlanId] = useState<null | string>(null);
   const [activeTab, setActiveTab] = useState("workout");
+  const [checkedDays, setCheckedDays] = useState<Record<string, boolean>>({});
 
   const activePlan = allPlans?.find((plan) => plan.isActive);
 
   const currentPlan = selectedPlanId
     ? allPlans?.find((plan) => plan._id === selectedPlanId)
     : activePlan;
+
+  const allDaysChecked =
+    currentPlan &&
+    currentPlan.workoutPlan.exercises.every((day) => checkedDays[day.day]);
 
   return (
     <section className="relative z-10 pt-12 pb-32 flex-grow container mx-auto px-4">
@@ -145,8 +151,45 @@ const ProfilePage = () => {
                           >
                             <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/10 font-mono">
                               <div className="flex justify-between w-full items-center">
-                                <span className="text-primary">
-                                  {exerciseDay.day}
+                                <span
+                                  className="flex items-center gap-3 text-primary cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // Prevent accordion toggle
+                                    setCheckedDays((prev) => ({
+                                      ...prev,
+                                      [exerciseDay.day]: !prev[exerciseDay.day],
+                                    }));
+                                  }}
+                                  tabIndex={0}
+                                  role="checkbox"
+                                  aria-checked={!!checkedDays[exerciseDay.day]}
+                                  onKeyDown={(e) => {
+                                    if (e.key === " " || e.key === "Enter") {
+                                      e.preventDefault();
+                                      setCheckedDays((prev) => ({
+                                        ...prev,
+                                        [exerciseDay.day]:
+                                          !prev[exerciseDay.day],
+                                      }));
+                                    }
+                                  }}
+                                >
+                                  {checkedDays[exerciseDay.day] ||
+                                  exerciseDay.workoutComplete ? (
+                                    <CheckCircle2 className="h-7 w-7 text-green-400" />
+                                  ) : (
+                                    <Circle className="h-7 w-7 text-green-400" />
+                                  )}
+
+                                  <span
+                                    className={
+                                      exerciseDay.workoutComplete
+                                        ? "line-through"
+                                        : ""
+                                    }
+                                  >
+                                    {exerciseDay.day}
+                                  </span>
                                 </span>
                                 <div className="text-xs text-muted-foreground">
                                   {exerciseDay.routines.length} EXERCISES
@@ -189,6 +232,28 @@ const ProfilePage = () => {
                         )
                       )}
                     </Accordion>
+                  </div>
+                  <div className="mt-6 flex justify-between items-center">
+                    <button
+                      className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition"
+                      onClick={() => {
+                        if (allDaysChecked) {
+                          setCheckedDays({});
+                        } else {
+                          const allChecked: Record<string, boolean> = {};
+                          currentPlan.workoutPlan.exercises.forEach((day) => {
+                            allChecked[day.day] = true;
+                          });
+                          setCheckedDays(allChecked);
+                        }
+                      }}
+                    >
+                      {allDaysChecked ? "Reset All" : "Mark All as Complete"}
+                    </button>
+                    <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
+                      {" "}
+                      Save Progress
+                    </button>
                   </div>
                 </TabsContent>
 

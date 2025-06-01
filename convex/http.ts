@@ -76,16 +76,14 @@ http.route({
 });
 const generateRequest = httpAction(async (ctx, request) => {
   try {
-    const url = new URL(request.url);
-    const params = url.searchParams;
+    const bodyText = await request.text();
+    console.log("Request Body:", bodyText);
+    const params = new URLSearchParams(bodyText);
 
     // Extract and decode parameters
     const age = params.get("age");
     const gender = params.get("gender") || "not specified";
     const userId = params.get("userId");
-    if (!userId) {
-      throw new Error("Missing required parameter: userId");
-    }
     const height = params.get("height");
     const weight = params.get("weight");
     const fitness_goal = params.get("fitness_goal") || "Tone Up";
@@ -145,6 +143,9 @@ const generateRequest = httpAction(async (ctx, request) => {
 
     // save to our DB: CONVEX
 
+    if (!userId) {
+      throw new Error("Missing required parameter: userId");
+    }
     const planId = await ctx.runMutation(api.plans.createPlan, {
       userId,
       dietPlan,

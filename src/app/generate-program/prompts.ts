@@ -69,6 +69,7 @@ export function validateWorkoutPlan(plan: any) {
     exercises: Array.isArray(plan.exercises)
       ? plan.exercises.map((exercise: any) => ({
           day: exercise.day,
+          workoutComplete: false,
           routines: Array.isArray(exercise.routines)
             ? exercise.routines.map((routine: any) => ({
                 name: routine.name,

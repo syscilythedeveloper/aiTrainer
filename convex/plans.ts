@@ -11,6 +11,7 @@ export const createPlan = mutation({
       exercises: v.array(
         v.object({
           day: v.string(),
+          workoutComplete: v.optional(v.boolean()),
           routines: v.array(
             v.object({
               name: v.string(),

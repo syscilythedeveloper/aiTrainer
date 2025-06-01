@@ -283,7 +283,9 @@ const GenerateProgram = () => {
               <h2 className="text-xl font-bold text-foreground">You</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 {user
-                  ? (user.firstName + " " + (user.lastName || "")).trim()
+                  ? user.firstName || user.lastName
+                    ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+                    : "Trainee"
                   : "Guest"}
               </p>
 

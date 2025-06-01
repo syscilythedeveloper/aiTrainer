@@ -2,7 +2,8 @@
 
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import { GiStrongMan } from "react-icons/gi";
-import { DumbbellIcon, HomeIcon, UserIcon } from "lucide-react";
+import { HomeIcon, UserIcon } from "lucide-react";
+import { FaRunning } from "react-icons/fa";
 import Link from "next/link";
 import { Button } from "./ui/button";
 
@@ -41,7 +42,7 @@ const Navbar = () => {
                 href="/generate-program"
                 className="flex items-center gap-1.5 text-sm hover:text-primary transition-colors"
               >
-                <DumbbellIcon size={16} />
+                <FaRunning size={12} />
                 <span>Generate</span>
               </Link>
 

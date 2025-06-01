@@ -9,8 +9,9 @@ import NoFitnessPlan from "@/components/NoFitnessPlan";
 import CornerElements from "@/components/CornerElements";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AppleIcon, CalendarIcon, DumbbellIcon } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { Pie } from "@brightlayer-ui/react-progress-icons";
+import { LuUtensils } from "react-icons/lu";
 import {
   Accordion,
   AccordionContent,
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/accordion";
 import { CheckCircle2, Circle } from "lucide-react"; // Add at the top
 import { useMutation } from "convex/react";
+import { FaRunning } from "react-icons/fa";
 
 const ProfilePage = () => {
   const { user, isLoaded } = useUser();
@@ -132,7 +134,7 @@ const ProfilePage = () => {
                     value="workout"
                     className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
                   >
-                    <DumbbellIcon
+                    <FaRunning
                       className={`mr-2 h-4 w-4 ${
                         activeTab === "workout"
                           ? "text-yellow-500"
@@ -146,13 +148,13 @@ const ProfilePage = () => {
                     value="diet"
                     className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
                   >
-                    <AppleIcon
+                    <LuUtensils
                       className={`mr-2 h-4 w-4 ${
                         activeTab === "diet"
                           ? "text-yellow-500"
                           : "text-foreground"
                       }`}
-                    />
+                    />{" "}
                     Diet Plan
                   </TabsTrigger>
                 </TabsList>

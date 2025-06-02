@@ -96,6 +96,8 @@ http.route({
 });
 const generateRequest = httpAction(async (ctx, request) => {
   try {
+    //refactor to move genAI initialization to a separate file
+
     const data = await request.json();
 
     const args = data.message.toolCalls[0].function.arguments;
